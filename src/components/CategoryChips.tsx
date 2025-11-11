@@ -23,7 +23,7 @@ export function CategoryChips() {
     <div className="flex flex-wrap gap-2" role="group" aria-label="Category filters">
       <button
         onClick={() => setCategory(null)}
-        className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-110 active:scale-95 ${
+        className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) transform hover:scale-105 active:scale-98 ${
           selectedCategory === null
             ? 'bg-black text-white border border-black glass-hover'
             : 'glass text-gray-700 hover:glass-light border border-gray-300 hover:animate-bounce-gentle'
@@ -36,7 +36,7 @@ export function CategoryChips() {
         <button
           key={category}
           onClick={() => setCategory(category)}
-          className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-110 active:scale-95 capitalize ${
+          className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) transform hover:scale-105 active:scale-98 capitalize ${
             selectedCategory === category
               ? 'bg-black text-white border border-black glass-hover'
               : 'glass text-gray-700 hover:glass-light border border-gray-300 hover:animate-bounce-gentle'
