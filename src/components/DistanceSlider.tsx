@@ -8,7 +8,7 @@ import { useAppStore } from '../store'
 export function DistanceSlider() {
   const { filters, setRadius } = useAppStore()
   const [localRadius, setLocalRadius] = useState(filters.radius)
-  const debounceTimerRef = useRef<NodeJS.Timeout>()
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>()
 
   // Update local radius when store radius changes (from external sources)
   useEffect(() => {

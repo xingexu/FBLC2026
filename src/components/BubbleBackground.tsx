@@ -18,7 +18,6 @@ export function BubbleBackground() {
   const containerRef = useRef<HTMLDivElement>(null)
   const bubblesRef = useRef<Bubble[]>([])
   const animationFrameRef = useRef<number>()
-  const [isHovered, setIsHovered] = useState(false)
   const [targetOpacity, setTargetOpacity] = useState(0)
 
   useEffect(() => {
@@ -59,12 +58,10 @@ export function BubbleBackground() {
 
     // Handle hover state - show bubbles when mouse enters, hide when it leaves
     const handleMouseEnter = () => {
-      setIsHovered(true)
       setTargetOpacity(1)
     }
 
     const handleMouseLeave = () => {
-      setIsHovered(false)
       setTargetOpacity(0)
     }
 
