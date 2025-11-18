@@ -1,346 +1,184 @@
-# LocaLink - Toronto Small Business Directory
+LocaLink – Toronto Small Business Directory
 
-A production-grade Progressive Web App (PWA) that helps users discover nearby small businesses in Toronto. Built with React, TypeScript, and IndexedDB for full offline functionality.
+LocaLink is a production-grade Progressive Web App (PWA) designed to help users discover small businesses across Toronto. It operates fully offline using IndexedDB and a client-side architecture, making it a complete standalone solution.
 
-## 🎯 Requirements Satisfaction
+Overview
 
-This project satisfies all requirements from the 2025-26 event brief:
+LocaLink allows users to search, filter, review, and bookmark Toronto small businesses with no backend server required. The application uses React, TypeScript, and IndexedDB to ensure reliable functionality both online and offline.
 
-### Core Features
-- ✅ **Sorting businesses by category** (e.g., food, retail, services)
-- ✅ **Allowing users to leave reviews or ratings** (1-5 stars with text)
-- ✅ **Sorting businesses by reviews or ratings**
-- ✅ **Saving or bookmarking favorite businesses**
-- ✅ **Display special deals or coupons** with expiry dates and copy codes
-- ✅ **Verification step to prevent bot activity** (slider captcha + timing checks)
+Features
+Core Functionality
 
-### Event Rules Compliance
-- ✅ **Standalone solution** - Runs with no programming errors, no external servers required
-- ✅ **7-minute presentation + 3-minute Q&A** - See demo script below
-- ✅ **Offline functionality** - Works in airplane mode with seed data cached in IndexedDB
+Sorting businesses by category (food, retail, services, etc.)
 
-## 🏗️ Architecture
+Sorting by rating, distance, or review count
 
-### Technology Stack
-- **Frontend**: React 18 + Vite + TypeScript
-- **Routing**: React Router v6
-- **Styling**: TailwindCSS
-- **State Management**: Zustand
-- **Validation**: Zod
-- **Database**: IndexedDB via `idb` library
-- **Maps**: Leaflet with OpenStreetMap tiles
-- **PDF Export**: jsPDF + jspdf-autotable
-- **Forms**: React Hook Form
+Business detail pages with website links, directions, contact, and operating hours
 
-### Why React PWA with IndexedDB?
+Review system with rating, text, slider verification, and timing checks
 
-**Standalone Operation**: 
-- No backend server required - all data stored client-side in IndexedDB
-- Seed data bundled with the app ensures functionality even without network
-- Service Worker caches app shell and assets for offline access
+Bookmarking and saved business lists
 
-**No Power/Network Assumptions**:
-- Works fully offline after initial load
-- IndexedDB persists data across browser sessions
-- Seed data provides 50+ Toronto businesses for demo purposes
-- Overpass API integration gracefully falls back to seed data on network failure
+Map view using Leaflet and OpenStreetMap tiles
 
-## 📁 Project Structure
+Dedicated deals page with expiry dates and copyable coupon codes
 
-```
+Export of data to CSV or PDF
+
+Offline operation through IndexedDB and service worker caching
+
+Standalone Capability
+
+Fully functional without network access after initial load
+
+Seed data containing fifty Toronto small businesses
+
+Automatic fallback to seed data if Overpass API is unavailable
+
+Technology Stack
+
+React 18 with Vite
+
+TypeScript
+
+React Router 6
+
+TailwindCSS
+
+Zustand for state management
+
+Zod for validation
+
+IndexedDB via the idb library
+
+Leaflet for mapping
+
+jsPDF and jspdf-autotable for exporting
+
+React Hook Form for forms
+
+Project Structure
 src/
-├── components/          # Reusable UI components
-│   ├── BusinessCard.tsx
-│   ├── CategoryChips.tsx
-│   ├── RatingStars.tsx
-│   ├── DealCard.tsx
-│   ├── BookmarkButton.tsx
-│   ├── CaptchaSlider.tsx
-│   ├── MapView.tsx
-│   └── ...
-├── pages/              # Route pages
-│   ├── Home.tsx
-│   ├── Explore.tsx
-│   ├── Business.tsx
-│   ├── Deals.tsx
-│   ├── Bookmarks.tsx
-│   ├── Report.tsx
-│   └── AddBusiness.tsx
-├── db/                  # Database layer
-│   ├── indexeddb.ts     # Schema and initialization
-│   ├── repo.ts          # CRUD operations
-│   ├── init.ts          # Seed data loader
-│   └── seed.json        # 50 Toronto businesses
-├── overpass/            # Overpass API integration
-│   ├── queryTemplate.ts
-│   ├── bbox.ts
-│   └── fetchNearby.ts
-├── reviews/             # Review system
-│   ├── schemas.ts       # Zod validation
-│   └── ReviewForm.tsx   # Form with captcha
-├── reco/                # Recommendation engine
-│   ├── recommend.ts     # Cosine similarity
-│   └── recommend.test.ts
-├── export/              # Export utilities
-│   ├── csv.ts
-│   └── pdf.ts
-├── utils/               # Utility functions
-│   ├── geo.ts          # Haversine distance
-│   └── links.ts        # URL sanitization
-├── store/              # Zustand stores
-├── types/              # TypeScript types
-└── styles/             # Global styles
-```
+  components/
+  pages/
+  db/
+  overpass/
+  reviews/
+  reco/
+  export/
+  utils/
+  store/
+  types/
+  styles/
 
-## 🚀 Getting Started
 
-### Prerequisites
-- Node.js 18+ and npm/pnpm
-- Modern browser with IndexedDB support
+Each folder handles a single responsibility: UI components, database layer, business logic, utilities, and so on.
 
-### Installation
+Getting Started
+Requirements
 
-```bash
-# Install dependencies
+Node.js 18 or higher
+
+npm or pnpm
+
+Modern browser with IndexedDB support
+
+Installation
 pnpm install
-
-# Start development server
 pnpm dev
-
-# Build for production
 pnpm build
-
-# Preview production build
 pnpm preview
+pnpm test
+pnpm lint
 
-# Run tests
+
+The development server runs at http://localhost:3000
+.
+
+Data and API Integration
+Seed Data
+
+The application includes fifty Toronto businesses across ten neighborhoods, each with a category, coordinates, and optional deals.
+
+Overpass API
+
+If network access is available, the app attempts to fetch nearby businesses from OpenStreetMap. If the request fails or times out, the app falls back to the bundled seed data. Chain businesses are filtered out to keep results focused on local establishments.
+
+Offline Operation
+
+The project uses:
+
+Service worker caching for all app assets
+
+IndexedDB for persistent client-side storage
+
+Seed data for full functionality without internet
+
+After the first load, the app continues to work in airplane mode, including search, sorting, review creation, bookmarks, and viewing deals.
+
+Security and Validation
+
+All forms validated with Zod
+
+URL and phone fields sanitized
+
+Review system uses slider verification, timing checks, and local rate-limiting
+
+React’s escape-by-default behavior prevents script injection
+
+Accessibility
+
+LocaLink includes:
+
+Keyboard-accessible interface
+
+Semantic HTML structure
+
+ARIA labels
+
+High-contrast theme option
+
+Visible focus indicators
+
+These features follow WCAG AA guidelines.
+
+Testing
+
+The project includes:
+
+Unit tests for recommendation logic, validation schemas, and utility functions
+
+Integration tests for database operations
+
+End-to-end tests for key flows such as adding reviews and bookmarking
+
+Run all tests with:
+
 pnpm test
 
-# Lint code
-pnpm lint
-```
-
-The app will be available at `http://localhost:3000`
-
-## 📊 Data
-
-### Seed Data
-- **50 Toronto businesses** across 10 neighborhoods:
-  - Kensington Market
-  - Leslieville
-  - The Junction
-  - Roncesvalles
-  - Danforth
-  - North York
-  - Scarborough
-  - Etobicoke
-  - Midtown
-  - Chinatown
-
-- **Categories**: food, retail, services, health, arts, fitness, repair, books
-- **12 active deals** with expiry dates within 6 months
-- **Realistic coordinates**: Toronto area (43.58-43.76 lat, -79.50 to -79.24 lng)
-
-### Overpass API Integration
-- Fetches nearby businesses from OpenStreetMap
-- **Brand filtering**: Excludes chain stores (Starbucks, McDonald's, etc.)
-- **Fallback**: Uses seed data if network fails or rate limited
-- **Small business heuristic**: Requires website/phone OR no brand tag
-
-## 🎬 7-Minute Demo Script
-
-### 0:00 - Launch & Overview
-- Open app, explain goal: "Discover Toronto's small businesses"
-- Grant geolocation permission
-- Show Near Me button working
-
-### 0:45 - Category Filtering & Sorting
-- Filter by "Food" category
-- Sort by rating (highest first)
-- Sort by distance (nearest first)
-- Show map view with markers
-
-### 1:30 - Business Details
-- Click on a business card
-- Show website link, phone, directions
-- Display hours of operation
-- Show active deals with copy code button
-
-### 2:00 - Review System
-- Click "Write a Review"
-- Complete slider captcha (bot prevention)
-- Submit review with rating and text
-- Show updated rating on business page
-
-### 2:30 - Bookmarks
-- Bookmark a business
-- Navigate to Bookmarks page
-- Show saved businesses
-
-### 2:50 - Deals Page
-- Navigate to Deals
-- Filter by category
-- Copy a coupon code
-- Show expiry date
-
-### 3:20 - Recommendations
-- Show "Recommended for you" panel (if implemented)
-- Explain cosine similarity algorithm
-
-### 3:45 - Offline Demo
-- **Toggle airplane mode**
-- Show app still works
-- Browse businesses from IndexedDB
-- Add bookmark (saves locally)
-- View deals (cached)
-
-### 4:30 - Export Reports
-- Navigate to Report page
-- Export top-rated businesses to CSV
-- Export bookmarks to PDF
-- Open files to verify
-
-### 5:00 - Code Walkthrough
-- Show folder structure
-- Highlight code comments
-- Show Zod validation schemas
-- Show brand exclusion logic
-
-### 6:00 - Rubric Mapping
-- **Functionality**: All features working
-- **Input Validation**: Zod schemas, URL sanitization
-- **Output & Analysis**: CSV/PDF export, sorting, filtering
-- **Intelligent Feature**: Recommendation engine with cosine similarity
-
-### 6:45 - Future Work
-- Owner claim flow
-- Photo uploads
-- Real-time updates
-
-## ❓ 3-Minute Q&A Cheat Sheet
-
-### Why PWA and IndexedDB for standalone?
-- **PWA**: Installable, works offline, no app store needed
-- **IndexedDB**: Client-side database, persists data, no backend required
-- **Seed data**: Ensures demo works without network
-- **Service Worker**: Caches assets for offline access
-
-### Fairness of brand exclusion?
-- **Focus on small businesses**: Event brief emphasizes local businesses
-- **Manual add flow**: `/add-business` allows adding any business
-- **Transparent filtering**: Code clearly shows exclusion list
-- **OSM data**: Overpass API naturally favors businesses with website/phone
-
-### Bot prevention choices and privacy?
-- **Slider captcha**: Simple, accessible, no external service
-- **Timing checks**: Minimum 5 seconds on form (human behavior)
-- **Rate limiting**: 30-second cooldown between reviews
-- **Privacy**: All data stored locally, no tracking
-
-### Accessibility measures?
-- **Keyboard navigation**: All interactive elements keyboard-accessible
-- **ARIA labels**: Screen reader support throughout
-- **Focus management**: Visible focus indicators
-- **High contrast theme**: Toggle for visual accessibility
-- **Semantic HTML**: Proper landmarks and structure
-
-## 🔒 Security & Validation
-
-### Input Validation
-- **Zod schemas**: All forms validated with Zod
-- **URL sanitization**: Website and phone links validated
-- **XSS prevention**: React escapes content by default
-- **Type safety**: TypeScript prevents type errors
-
-### Bot Prevention
-- **Slider captcha**: Must slide to 80%+ to verify
-- **Timing check**: Minimum 5 seconds on review form
-- **Rate limiting**: 30-second cooldown between reviews
-- **Human behavior**: Checks for natural interaction patterns
-
-## ♿ Accessibility
-
-See `src/a11y-checklist.md` for detailed accessibility checklist.
-
-### Key Features
-- ✅ Keyboard-first navigation
-- ✅ ARIA labels on all interactive elements
-- ✅ Focus management and visible focus indicators
-- ✅ High contrast theme toggle
-- ✅ Screen reader support
-- ✅ WCAG AA color contrast compliance
-
-## 🧪 Testing
-
-### Unit Tests
-- Recommendation engine (cosine similarity)
-- Input validation schemas
-- Geographic utilities (Haversine distance)
-
-### Integration Tests
-- Database operations with fake IndexedDB
-- Repository functions
-
-### E2E Tests (Playwright)
-- Add review flow
-- Bookmark flow
-- Search and filter
-
-Run tests: `pnpm test`
-
-## 📦 Build & Deploy
-
-### Production Build
-```bash
+Build and Deployment
+Production Build
 pnpm build
-```
 
-Output: `dist/` directory with optimized assets
 
-### PWA Features
-- **Manifest**: `public/manifest.webmanifest`
-- **Service Worker**: Auto-generated by Vite PWA plugin
-- **Offline support**: Caches shell and seed data
-- **Installable**: Add to home screen on mobile/desktop
+This generates an optimized dist folder ready for deployment.
 
-## 🌐 Offline Demo Steps
+PWA Configuration
 
-1. **Initial Load**: Open app, allow geolocation
-2. **Enable Airplane Mode**: Toggle airplane mode in browser/dev tools
-3. **Verify Functionality**:
-   - Browse businesses (from IndexedDB)
-   - Search and filter (client-side)
-   - View business details
-   - Add bookmark (saves to IndexedDB)
-   - View deals (cached)
-   - Export reports (client-side generation)
+Manifest at public/manifest.webmanifest
 
-## 📝 Notes
+Service worker generated automatically through Vite’s PWA plugin
 
-### Overpass API Limits
-- **Rate limiting**: May be rate limited with frequent requests
-- **Fallback**: Automatically uses seed data on failure
-- **Brand filtering**: Excludes known chain stores
-- **Small business heuristic**: Requires website/phone OR no brand tag
+Offline caching for assets and seed data
 
-### Toronto Seed Data
-- **Provenance**: Generated for demo purposes
-- **Disclaimer**: Business names and details are fictional
-- **Coordinates**: Realistic Toronto area coordinates
-- **Categories**: Covers all required categories
+Notes
 
-### Data Structures
-- **Lists and arrays**: Used throughout (categories, tags, hours)
-- **Typed repositories**: TypeScript interfaces for all data
-- **Clear scope**: Each module has single responsibility
+Overpass API may enforce rate limits; the application degrades gracefully to local data.
 
-## 📄 License
+Business data bundled with the project is fictional and used for demonstration only.
 
-This project is created for the 2025-26 event demonstration.
+No backend servers, databases, or external authentication services are required.
 
-## 🙏 Acknowledgments
+License
 
-- OpenStreetMap for map tiles and business data
-- Overpass API for live business queries
-- Toronto small business community
-
+This project was developed for the 2025–26 Coding and Programming competitive event.
