@@ -1,14 +1,16 @@
 /**
  * Add Business page
  * Form to manually add businesses with validation
+ * Only accessible to admin users
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { addBusiness } from '../db/repo'
+import { addBusiness, getUserById } from '../db/repo'
 import { Business } from '../types'
+import { useAppStore } from '../store'
 
 const businessSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -35,8 +37,32 @@ const CATEGORIES = [
 
 export function AddBusiness() {
   const navigate = useNavigate()
+  const { currentUserId } = useAppStore()
   const [submitting, setSubmitting] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    checkAdminAccess()
+  }, [currentUserId])
+
+  const checkAdminAccess = async () => {
+    try {
+      const user = await getUserById(currentUserId)
+      if (user && user.role === 'admin') {
+        setIsAdmin(true)
+      } else {
+        // Redirect non-admin users
+        navigate('/home')
+      }
+    } catch (error) {
+      console.error('Error checking admin access:', error)
+      navigate('/home')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const {
     register,
@@ -103,14 +129,40 @@ export function AddBusiness() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8">
+          <div className="h-10 bg-gray-200 rounded w-1/3 mb-4 animate-pulse"></div>
+          <div className="h-5 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+        </div>
+        <div className="glass rounded-2xl p-8 md:p-12 max-w-2xl mx-auto border border-gray-200 skeleton-pulse">
+          <div className="space-y-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i}>
+                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                <div className="h-12 bg-gray-200 rounded-lg"></div>
+              </div>
+            ))}
+            <div className="h-14 bg-gray-200 rounded-xl"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAdmin) {
+    return null // Will redirect in useEffect
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Add a Business</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-black mb-2">Add a Business</h1>
         <p className="text-lg text-gray-600">Help us grow the directory by adding a local business</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-2xl mx-auto border border-gray-100">
+      <form onSubmit={handleSubmit(onSubmit)} className="glass rounded-2xl p-8 md:p-12 max-w-2xl mx-auto border border-gray-200 shadow-md hover:shadow-xl">
         <div className="space-y-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -120,7 +172,7 @@ export function AddBusiness() {
               id="name"
               type="text"
               {...register('name')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 glass border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -139,8 +191,8 @@ export function AddBusiness() {
                   onClick={() => toggleCategory(category)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedCategories.includes(category)
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      ? 'bg-black text-white border border-black'
+                      : 'glass text-gray-700 hover:glass-light border border-gray-300'
                   }`}
                 >
                   {category}
@@ -160,7 +212,7 @@ export function AddBusiness() {
               id="address"
               type="text"
               {...register('address')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 glass border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
             />
             {errors.address && (
               <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
@@ -177,7 +229,7 @@ export function AddBusiness() {
                 type="number"
                 step="0.0001"
                 {...register('lat', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 glass border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               />
               {errors.lat && (
                 <p className="mt-1 text-sm text-red-600">{errors.lat.message}</p>
@@ -192,7 +244,7 @@ export function AddBusiness() {
                 type="number"
                 step="0.0001"
                 {...register('lng', { valueAsNumber: true })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 glass border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               />
               {errors.lng && (
                 <p className="mt-1 text-sm text-red-600">{errors.lng.message}</p>
@@ -208,7 +260,7 @@ export function AddBusiness() {
               id="website"
               type="url"
               {...register('website')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 glass border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               placeholder="https://example.com"
             />
             {errors.website && (
@@ -224,7 +276,7 @@ export function AddBusiness() {
               id="phone"
               type="tel"
               {...register('phone')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 glass border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               placeholder="+14165551234"
             />
             {errors.phone && (
@@ -235,7 +287,7 @@ export function AddBusiness() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+            className="w-full px-6 py-4 bg-black text-white rounded-xl hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 disabled:transform-none"
           >
             {submitting ? (
               <span className="flex items-center justify-center gap-2">

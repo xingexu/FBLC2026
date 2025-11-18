@@ -44,11 +44,14 @@ export type Deal = {
   code: string
 }
 
+export type UserRole = 'user' | 'admin'
+
 export type User = {
   id: string
   nickname: string
   email?: string
   profilePhoto?: string
+  role?: UserRole // Defaults to 'user' if not specified
   createdAt: string
   verification: {
     emailVerified: boolean

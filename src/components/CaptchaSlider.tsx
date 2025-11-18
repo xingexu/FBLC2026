@@ -61,28 +61,44 @@ export function CaptchaSlider({ onVerify, disabled = false }: CaptchaSliderProps
     }
   }, [isDragging, position])
 
+  const isVerified = position >= 80
+
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Slide to verify you're human
+      <label className="block text-sm font-semibold text-gray-800 mb-3">
+        Verify you're human
       </label>
       <div
         ref={trackRef}
-        className="relative w-full h-12 bg-gray-200 rounded-full overflow-hidden"
+        className="relative w-full h-14 glass rounded-2xl overflow-hidden border border-gray-300 shadow-inner"
         role="slider"
         aria-valuenow={position}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label="Verification slider"
       >
+        {/* Background track with gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100" />
+        
+        {/* Progress fill */}
         <div
           ref={sliderRef}
-          className="absolute left-0 top-0 h-full bg-primary-600 transition-all duration-300"
+          className={`absolute left-0 top-0 h-full transition-all duration-300 ease-out ${
+            isVerified 
+              ? 'bg-gradient-to-r from-black to-gray-800' 
+              : 'bg-gradient-to-r from-gray-300 to-gray-400'
+          }`}
           style={{ width: `${position}%` }}
         />
+        
+        {/* Slider handle */}
         <div
-          className="absolute top-0 left-0 h-full w-12 bg-white border-2 border-primary-600 rounded-full cursor-grab active:cursor-grabbing flex items-center justify-center shadow-md transition-transform hover:scale-110"
-          style={{ left: `${position}%`, transform: 'translateX(-50%)' }}
+          className={`absolute top-1/2 left-0 h-12 w-12 -translate-y-1/2 glass rounded-full cursor-grab active:cursor-grabbing flex items-center justify-center shadow-lg border-2 transition-all duration-300 ${
+            isVerified
+              ? 'border-black bg-white'
+              : 'border-gray-400 bg-white'
+          } ${isDragging ? 'scale-110' : 'hover:scale-105'}`}
+          style={{ left: `${position}%`, transform: `translate(-50%, -50%)` }}
           onMouseDown={(e) => handleStart(e.clientX)}
           onTouchStart={(e) => handleStart(e.touches[0].clientX)}
           onTouchMove={(e) => handleMove(e.touches[0].clientX)}
@@ -99,23 +115,52 @@ export function CaptchaSlider({ onVerify, disabled = false }: CaptchaSliderProps
             }
           }}
         >
-          <svg
-            className="w-6 h-6 text-primary-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
+          {isVerified ? (
+            <svg
+              className="w-5 h-5 text-black"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={3}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="w-5 h-5 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          )}
         </div>
-        {position >= 80 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-sm font-medium text-white">Verified ✓</span>
+        
+        {/* Verification message */}
+        {isVerified && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-sm font-semibold text-white drop-shadow-lg">
+              Verified ✓
+            </span>
+          </div>
+        )}
+        
+        {/* Instruction text when not verified */}
+        {!isVerified && position < 10 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-xs font-medium text-gray-500">
+              Slide to verify
+            </span>
           </div>
         )}
       </div>

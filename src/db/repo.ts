@@ -5,10 +5,35 @@
 import { getDB } from './indexeddb'
 import { Business, Review, Bookmark, Deal, User } from '../types'
 
+// Simple in-memory cache for frequently accessed data
+const cache = {
+  businesses: null as Business[] | null,
+  businessesTimestamp: 0,
+  CACHE_TTL: 5000, // 5 seconds cache
+}
+
 // Business operations
 export async function getAllBusinesses(): Promise<Business[]> {
+  // Return cached data if still valid
+  const now = Date.now()
+  if (cache.businesses && (now - cache.businessesTimestamp) < cache.CACHE_TTL) {
+    return cache.businesses
+  }
+
   const db = await getDB()
-  return db.getAll('businesses')
+  const businesses = await db.getAll('businesses')
+  
+  // Update cache
+  cache.businesses = businesses
+  cache.businessesTimestamp = now
+  
+  return businesses
+}
+
+// Clear cache when businesses are modified
+function clearBusinessCache() {
+  cache.businesses = null
+  cache.businessesTimestamp = 0
 }
 
 export async function getBusinessById(id: string): Promise<Business | undefined> {
@@ -27,11 +52,13 @@ export async function getBusinessesByCategory(
 export async function addBusiness(business: Business): Promise<void> {
   const db = await getDB()
   await db.put('businesses', business)
+  clearBusinessCache()
 }
 
 export async function updateBusiness(business: Business): Promise<void> {
   const db = await getDB()
   await db.put('businesses', business)
+  clearBusinessCache()
 }
 
 export async function searchBusinesses(

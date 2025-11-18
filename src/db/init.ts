@@ -19,30 +19,35 @@ async function isInitialized(): Promise<boolean> {
 /**
  * Initialize database with seed data
  * Only runs if database is empty
+ * Uses batch operations for faster loading
  */
 export async function initializeDatabase(): Promise<void> {
   try {
     const initialized = await isInitialized()
     if (initialized) {
-      console.log('Database already initialized')
       return
     }
 
-    console.log('Initializing database with seed data...')
+    // Start initialization immediately
+    const db = await getDB()
+    const tx = db.transaction(['businesses', 'deals'], 'readwrite')
 
-    // Add businesses
-    for (const business of seedData.businesses as unknown as Business[]) {
-      await addBusiness(business)
-    }
+    // Batch add businesses (use Promise.all for parallel execution)
+    const businessPromises = (seedData.businesses as unknown as Business[]).map((business) =>
+      tx.store('businesses').put(business)
+    )
 
-    // Add deals
-    for (const deal of seedData.deals as Deal[]) {
-      await addDeal(deal)
-    }
+    // Batch add deals
+    const dealPromises = (seedData.deals as Deal[]).map((deal) =>
+      tx.store('deals').put(deal)
+    )
 
-    console.log('Database initialized successfully')
+    // Execute all operations in parallel for maximum speed
+    await Promise.all([...businessPromises, ...dealPromises])
+    await tx.done
   } catch (error) {
     console.error('Error initializing database:', error)
+    throw error
   }
 }
 

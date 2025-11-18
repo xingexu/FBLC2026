@@ -78,13 +78,29 @@ export function BubbleBackground() {
     // Smooth opacity transition
     let currentOpacity = 0
 
-    // Animation loop
-    const animate = () => {
+    // Animation loop - optimized to pause when not needed
+    let lastFrameTime = 0
+    const frameInterval = 16 // ~60fps, but we can skip frames when opacity is low
+    
+    const animate = (currentTime: number) => {
+      // Throttle animation when opacity is very low
+      if (currentTime - lastFrameTime < frameInterval && currentOpacity < 0.1) {
+        animationFrameRef.current = requestAnimationFrame(animate)
+        return
+      }
+      lastFrameTime = currentTime
+
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       // Smoothly transition opacity - slower for less pop
       const opacityDiff = targetOpacity - currentOpacity
       currentOpacity += opacityDiff * 0.02 // Much slower fade in/out to prevent pop
+
+      // Skip rendering entirely if opacity is too low
+      if (currentOpacity < 0.01) {
+        animationFrameRef.current = requestAnimationFrame(animate)
+        return
+      }
 
       bubblesRef.current.forEach((bubble) => {
         // Update position
@@ -98,9 +114,6 @@ export function BubbleBackground() {
         // Keep bubbles in bounds
         bubble.x = Math.max(0, Math.min(canvas.width, bubble.x))
         bubble.y = Math.max(0, Math.min(canvas.height, bubble.y))
-
-        // Only draw if opacity is above threshold
-        if (currentOpacity < 0.01) return
 
         // Draw bubble - very subtle white/grey with hover opacity
         const effectiveOpacity = bubble.opacity * currentOpacity
@@ -135,7 +148,7 @@ export function BubbleBackground() {
       animationFrameRef.current = requestAnimationFrame(animate)
     }
 
-    animate()
+    animate(0)
 
     return () => {
       window.removeEventListener('resize', resizeCanvas)
@@ -154,7 +167,10 @@ export function BubbleBackground() {
       <canvas
         ref={canvasRef}
         className="w-full h-full"
-        style={{ background: 'transparent' }}
+        style={{ 
+          background: 'transparent',
+          willChange: 'contents' // Optimize for animations
+        }}
       />
     </div>
   )

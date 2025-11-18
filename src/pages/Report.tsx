@@ -22,12 +22,15 @@ export function Report() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const allBusinesses = await getAllBusinesses()
+      // Load data in parallel for faster loading
+      const [allBusinesses, bookmarkedBusinesses] = await Promise.all([
+        getAllBusinesses(),
+        getBookmarkedBusinesses(currentUserId),
+      ])
+      
       const topRatedBusinesses = [...allBusinesses]
         .sort((a, b) => b.avgRating - a.avgRating)
         .slice(0, 20)
-
-      const bookmarkedBusinesses = await getBookmarkedBusinesses(currentUserId)
 
       setTopRated(topRatedBusinesses)
       setBookmarked(bookmarkedBusinesses)
@@ -79,35 +82,51 @@ export function Report() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Loading...</div>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8">
+          <div className="h-10 bg-gray-200 rounded w-1/3 mb-4 animate-pulse"></div>
+          <div className="h-5 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+        </div>
+        <div className="space-y-6">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="glass rounded-2xl p-8 border border-gray-200 skeleton-pulse">
+              <div className="h-7 bg-gray-200 rounded w-1/3 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+              <div className="flex gap-4 mb-4">
+                <div className="h-12 bg-gray-200 rounded-xl w-32"></div>
+                <div className="h-12 bg-gray-200 rounded-xl w-32"></div>
+              </div>
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">Reports & Exports</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-black mb-2">Reports & Exports</h1>
         <p className="text-lg text-gray-600">Export your data in CSV or PDF format</p>
       </div>
 
-      <div className="space-y-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 card-hover">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Top Rated Businesses</h2>
+      <div className="space-y-6">
+        <div className="glass rounded-2xl p-8 border border-gray-200 card-hover shadow-md hover:shadow-xl">
+          <h2 className="text-2xl font-bold mb-4 text-black">Top Rated Businesses</h2>
           <p className="text-gray-600 mb-4">
             Export the top 20 highest-rated businesses
           </p>
           <div className="flex gap-4">
             <button
               onClick={handleExportTopRatedCSV}
-              className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
             >
               Export CSV
             </button>
             <button
               onClick={handleExportTopRatedPDF}
-              className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 glass text-black rounded-xl hover:glass-light transition-all font-semibold border border-gray-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
             >
               Export PDF
             </button>
@@ -119,21 +138,21 @@ export function Report() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 card-hover">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">My Bookmarks</h2>
+        <div className="glass rounded-2xl p-8 border border-gray-200 card-hover shadow-md hover:shadow-xl">
+          <h2 className="text-2xl font-bold mb-4 text-black">My Bookmarks</h2>
           <p className="text-gray-600 mb-4">
             Export your bookmarked businesses
           </p>
           <div className="flex gap-4">
             <button
               onClick={handleExportBookmarksCSV}
-              className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
             >
               Export CSV
             </button>
             <button
               onClick={handleExportBookmarksPDF}
-              className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 glass text-black rounded-xl hover:glass-light transition-all font-semibold border border-gray-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95"
             >
               Export PDF
             </button>

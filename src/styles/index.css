@@ -238,6 +238,20 @@
     will-change: opacity, transform;
   }
 
+  /* Smooth skeleton pulse animation - faster and smoother */
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  .skeleton-pulse {
+    animation: skeleton-pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
   /* Gradient animation */
   @keyframes gradient-shift {
     0% {
@@ -295,6 +309,58 @@
       transform: scale(4);
       opacity: 0;
     }
+  }
+
+  /* Distance slider custom styles */
+  .distance-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: black;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .distance-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .distance-slider::-webkit-slider-thumb:active {
+    transform: scale(1.1);
+  }
+
+  .distance-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: black;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .distance-slider::-moz-range-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .distance-slider::-moz-range-thumb:active {
+    transform: scale(1.1);
+  }
+
+  .distance-slider::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: black;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
   .ripple {

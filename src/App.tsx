@@ -3,28 +3,52 @@
  * Sets up routing and initializes the application
  */
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import { useEffect } from 'react'
-import { Landing } from './pages/Landing'
-import { Login } from './pages/Login'
-import { SignUp } from './pages/SignUp'
-import { LocationConsent } from './pages/LocationConsent'
-import { Home } from './pages/Home'
-import { Explore } from './pages/Explore'
-import { Business } from './pages/Business'
-import { Deals } from './pages/Deals'
-import { Bookmarks } from './pages/Bookmarks'
-import { Report } from './pages/Report'
-import { AddBusiness } from './pages/AddBusiness'
+import { useEffect, useState, Suspense, lazy } from 'react'
 import { useAppStore } from './store'
 import { initializeDatabase } from './db/init'
+import { getUserById } from './db/repo'
 import { BubbleBackground } from './components/BubbleBackground'
+import { LoadingSpinner } from './components/LoadingSpinner'
 import './styles/index.css'
+
+// Lazy load routes for code splitting and faster initial load
+const Landing = lazy(() => import('./pages/Landing').then(m => ({ default: m.Landing })))
+const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })))
+const SignUp = lazy(() => import('./pages/SignUp').then(m => ({ default: m.SignUp })))
+const LocationConsent = lazy(() => import('./pages/LocationConsent').then(m => ({ default: m.LocationConsent })))
+const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })))
+const Explore = lazy(() => import('./pages/Explore').then(m => ({ default: m.Explore })))
+const Business = lazy(() => import('./pages/Business').then(m => ({ default: m.Business })))
+const Deals = lazy(() => import('./pages/Deals').then(m => ({ default: m.Deals })))
+const Bookmarks = lazy(() => import('./pages/Bookmarks').then(m => ({ default: m.Bookmarks })))
+const Report = lazy(() => import('./pages/Report').then(m => ({ default: m.Report })))
+const AddBusiness = lazy(() => import('./pages/AddBusiness').then(m => ({ default: m.AddBusiness })))
 
 function App() {
   const { theme, setTheme, currentUserId } = useAppStore()
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
-    // Initialize database with seed data
+    checkAdminStatus()
+  }, [currentUserId])
+
+  const checkAdminStatus = async () => {
+    if (currentUserId && currentUserId !== 'user-1') {
+      try {
+        const user = await getUserById(currentUserId)
+        setIsAdmin(user?.role === 'admin')
+      } catch (error) {
+        console.error('Error checking admin status:', error)
+        setIsAdmin(false)
+      }
+    } else {
+      setIsAdmin(false)
+    }
+  }
+
+  // Pre-initialize database immediately (critical for fast page loads)
+  useEffect(() => {
+    // Start initialization immediately but don't block rendering
     initializeDatabase().catch((error) => {
       console.error('Failed to initialize database:', error)
     })
@@ -79,12 +103,14 @@ function App() {
                 >
                   Reports
                 </Link>
-                <Link
-                  to="/add-business"
-                  className="text-gray-700 hover:text-black transition-colors font-medium px-3 py-2 rounded-lg glass-hover"
-                >
-                  Add Business
-                </Link>
+                {isAdmin && (
+                  <Link
+                    to="/add-business"
+                    className="text-gray-700 hover:text-black transition-colors font-medium px-3 py-2 rounded-lg glass-hover"
+                  >
+                    Add Business
+                  </Link>
+                )}
                   <button
                     onClick={() =>
                       setTheme(
@@ -107,19 +133,21 @@ function App() {
         )}
 
         <main>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/location-consent" element={<LocationConsent />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/business/:id" element={<Business />} />
-            <Route path="/deals" element={<Deals />} />
-            <Route path="/bookmarks" element={<Bookmarks />} />
-            <Route path="/report" element={<Report />} />
-            <Route path="/add-business" element={<AddBusiness />} />
-          </Routes>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/location-consent" element={<LocationConsent />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/business/:id" element={<Business />} />
+              <Route path="/deals" element={<Deals />} />
+              <Route path="/bookmarks" element={<Bookmarks />} />
+              <Route path="/report" element={<Report />} />
+              <Route path="/add-business" element={<AddBusiness />} />
+            </Routes>
+          </Suspense>
         </main>
 
         {currentUserId && currentUserId !== 'user-1' && (

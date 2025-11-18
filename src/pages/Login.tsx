@@ -75,10 +75,12 @@ export function Login() {
     try {
       // Create user
       const userId = `user-${Date.now()}`
+      const isAdminUser = username.toLowerCase().includes('admin')
       await addUser({
         id: userId,
         nickname: username.trim(),
         profilePhoto: profilePhoto || undefined,
+        role: isAdminUser ? 'admin' : 'user',
         createdAt: new Date().toISOString(),
         verification: {
           emailVerified: false,

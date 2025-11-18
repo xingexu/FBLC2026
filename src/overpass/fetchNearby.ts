@@ -58,14 +58,24 @@ function mapOSMToBusiness(node: any): Business | null {
   // Parse hours if available
   const hours = parseHours(node.tags.opening_hours)
 
+  // Validate coordinates
+  const lat = node.lat
+  const lng = node.lon || node.lng
+  
+  // Skip if coordinates are invalid
+  if (!lat || !lng || isNaN(lat) || isNaN(lng) || 
+      lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    return null
+  }
+
   return {
     id,
     name: node.tags.name,
     categories,
     tags: extractTags(node.tags),
     address: node.tags['addr:full'] || `${node.tags['addr:street'] || ''}, ${node.tags['addr:city'] || 'Toronto'}, ON`,
-    lat: node.lat,
-    lng: node.lon,
+    lat,
+    lng,
     website: node.tags.website || undefined,
     phone: node.tags.phone || undefined,
     hours,
